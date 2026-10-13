@@ -1,0 +1,43 @@
+name: Build ToneWave Android
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Download repository
+        uses: actions/checkout@v4
+
+      - name: Extract Android project
+        run: unzip -o ToneWave_Android_Project.zip
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+
+      - name: Build Android bundle
+        run: gradle bundleRelease
+
+      - name: Save build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: ToneWave-Android-Bundle
+          path: app/build/outputs/bundle/release/*.aab
